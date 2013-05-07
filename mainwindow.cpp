@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "pakfile.h"
+#include "bspfile.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -17,6 +18,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::closeFile()
+{
+    data.clear();
+}
+
 void MainWindow::openFile()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Files (*.pak)"));
@@ -28,7 +34,7 @@ void MainWindow::openFile()
 
         struct PakFile *header;
 
-        QByteArray data = pakFile.readAll();
+        data = pakFile.readAll();
         header = (PakFile *)data.data();
 
         if (0 == strncmp("PACK",&header->id[0], 4)) {
@@ -50,7 +56,20 @@ void MainWindow::openFile()
                 hash.insert(pakEntries[i].filename, pakEntries[i].getFileData(header));
             }
 
-            void *startMap = hash.value("maps/start.bsp");
+            BSPFile *startMap = (BSPFile *)hash.value("maps/start.bsp");
+            if (startMap->isSupportedFile()) {
+                qDebug("Valid map.");
+                qDebug("Number of models in map: %d", startMap->countOfModels());
+                qDebug("Number of vertices: %d", startMap->countOfVertices());
+
+                ui->widget->setMap(startMap);
+                ui->widget->repaint();
+
+                //char *entities = startMap->getEntities();
+                //qDebug("%s",entities);
+            } else {
+                qDebug("Invalid map.");
+            }
         } else {
             qDebug("Incorrect magic id code, expected: PACK found: %c%c%c%c",header->id[0],header->id[1],header->id[2],header->id[3]);
         }

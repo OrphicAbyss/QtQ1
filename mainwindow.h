@@ -17,9 +17,11 @@ public:
 
 public slots:
     void openFile();
+    void closeFile();
     
 private:
     Ui::MainWindow *ui;
+    QByteArray data;
 };
 
 #endif // MAINWINDOW_H
