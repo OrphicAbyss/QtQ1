@@ -52,12 +52,12 @@ void GLWidget::paintGL()
 
         Vec3 fan[3];
 
+        glBegin(GL_TRIANGLES);
         for (int i=0; i<faceCount; i++) {
             BSPFace *face = &faces[i];
             short firstEdge = face->firstEdge;
             int edgeCount = face->countOfEdges;
 
-            glBegin(GL_TRIANGLES);
             for (int j=0; j<edgeCount; j++) {
                 int edgeIndex = faceEdges[firstEdge + j];
                 BSPEdge *edge;
@@ -89,8 +89,8 @@ void GLWidget::paintGL()
                     }
                 }
             }
-            glEnd();
         }
+        glEnd();
     }
 }
 
