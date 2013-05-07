@@ -3,7 +3,7 @@
 
 typedef float scalar;        // Scalar value,
 
-typedef struct                 // Vector or Position
+struct Vec3                 // Vector or Position
 {
     union {
         struct {
@@ -15,6 +15,7 @@ typedef struct                 // Vector or Position
     };
 
     scalar *getValues();
-} Vec3;
+    void set(const Vec3 *values);
+};
 
 #endif // BASICTYPES_H

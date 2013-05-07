@@ -22,6 +22,9 @@ void GLWidget::initializeGL()
 
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
+
+    glCullFace(GL_FRONT);
+    glEnable(GL_CULL_FACE);
 }
 
 void GLWidget::paintGL()
@@ -47,41 +50,47 @@ void GLWidget::paintGL()
         BSPEdge *edges = map->getEdges();
         Vec3 *vertices = map->getVertices();
 
-        glBegin(GL_LINES);
+        Vec3 fan[3];
+
         for (int i=0; i<faceCount; i++) {
             BSPFace *face = &faces[i];
             short firstEdge = face->firstEdge;
             int edgeCount = face->countOfEdges;
 
+            glBegin(GL_TRIANGLES);
             for (int j=0; j<edgeCount; j++) {
                 int edgeIndex = faceEdges[firstEdge + j];
                 BSPEdge *edge;
-                float *vertex1, *vertex2;
+                Vec3 *vertex1;
 
                 if (0 > edgeIndex) {
                     edge = &edges[-edgeIndex];
-                    vertex2 = &vertices[edge->vertex1].values[0];
-                    vertex1 = &vertices[edge->vertex2].values[0];
+                    vertex1 = &vertices[edge->vertex2];
                 } else {
                     edge = &edges[edgeIndex];
-                    vertex1 = &vertices[edge->vertex1].values[0];
-                    vertex2 = &vertices[edge->vertex2].values[0];
+                    vertex1 = &vertices[edge->vertex1];
                 }
 
-                float green = vertex1[0] / 1024.0f;
-                float blue = vertex1[1] / 1024.0f;
+                if (j < 2) {
+                    fan[j].set(vertex1);
+                } else {
+                    if (j > 2) {
+                        fan[1].set(&fan[2]);
+                    }
+                    fan[2].set(vertex1);
 
-                glColor4f(1.0f,green,blue,1.0f);
-                glVertex3fv(vertex1);
+                    for (int k=0; k<3; k++) {
+                        float *vertex = fan[k].values;
+                        float green = vertex[0] / 1024.0f;
+                        float blue = vertex[1] / 1024.0f;
 
-                green = vertex2[0] / 1024.0f;
-                blue = vertex2[1] / 1024.0f;
-
-                glColor4f(1.0f,green,blue,1.0f);
-                glVertex3fv(vertex2);
+                        glColor4f(1.0f,green,blue,1.0f);
+                        glVertex3fv(vertex);
+                    }
+                }
             }
+            glEnd();
         }
-        glEnd();
     }
 }
 
