@@ -45,9 +45,19 @@ int BSPFile::countOfEdges()
     return this->edges.size / sizeof(BSPEdge);
 }
 
-short *BSPFile::getEdgeList()
+BSPFace *BSPFile::getFaces()
 {
-    return (short *)((char *)this + this->listOfEdges.offset);
+    return (BSPFace *)((char *)this + this->faces.offset);
+}
+
+int BSPFile::countOfFaces()
+{
+    return this->faces.size / sizeof(BSPFace);
+}
+
+int *BSPFile::getEdgeList()
+{
+    return (int *)((char *)this + this->listOfEdges.offset);
 }
 
 short BSPFace::getEdge(int edge)

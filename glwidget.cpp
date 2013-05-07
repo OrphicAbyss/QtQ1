@@ -1,15 +1,14 @@
 #include "glwidget.h"
 
-#include <QMatrix4x4>
-
+#include "matrix.h"
 #include "bspfile.h"
 
 GLWidget::GLWidget(QWidget *parent) :
     QGLWidget(parent)
 {
     map = NULL;
-    projection = new QMatrix4x4();
-    world = new QMatrix4x4();
+    projection = new Matrix();
+    world = new Matrix();
 }
 
 void GLWidget::setMap(BSPFile *map)
@@ -36,53 +35,53 @@ void GLWidget::paintGL()
     world->rotate(45, 0.0f, 0.0f, 1.0f);
     //world->rotate(seconds * 36.0, 1.0, 0.0, 0.0);
     //world->rotate(seconds * 46.0, 0.0, 0.0, 1.0);
-    glLoadMatrixf(world->constData());
+    glLoadMatrixf(world->data());
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (map != NULL) {
-//RENDER ALL VERTICES
-//        int vertexCount = map->countOfVertices();
-//        Vec3 *vertices = map->getVertices();
-
-//        glBegin(GL_POINTS);
-//        for (int i=0; i<vertexCount; i++) {
-//            float *values = &vertices[i].values[0];
-
-//            float green = values[0] / 4096.0f;
-//            float blue = values[1] / 4096.0f;
-
-//            glColor4f(1.0f,green,blue,1.0f);
-//            glVertex3fv(values);
-//        }
-//        glEnd();
-
-//RENDER ALL EDGES
-        int edgeCount = map->countOfEdges();
-        //int vertexCount = map->countOfVertices();
+//RENDER ALL FACES
+        int faceCount = map->countOfFaces();
+        BSPFace *faces = map->getFaces();
+        int *faceEdges = map->getEdgeList();
         BSPEdge *edges = map->getEdges();
         Vec3 *vertices = map->getVertices();
 
         glBegin(GL_LINES);
-        for (int i=0; i<edgeCount; i++) {
-            BSPEdge *edge = &edges[i];
-            float *vertex1 = &vertices[edge->vertex1].values[0];
-            float *vertex2 = &vertices[edge->vertex2].values[0];
+        for (int i=0; i<faceCount; i++) {
+            BSPFace *face = &faces[i];
+            short firstEdge = face->firstEdge;
+            int edgeCount = face->countOfEdges;
 
-            float green = vertex1[0] / 4096.0f;
-            float blue = vertex1[1] / 4096.0f;
+            for (int j=0; j<edgeCount; j++) {
+                int edgeIndex = faceEdges[firstEdge + j];
+                BSPEdge *edge;
+                float *vertex1, *vertex2;
 
-            glColor4f(1.0f,green,blue,1.0f);
-            glVertex3fv(vertex1);
+                if (0 > edgeIndex) {
+                    edge = &edges[-edgeIndex];
+                    vertex2 = &vertices[edge->vertex1].values[0];
+                    vertex1 = &vertices[edge->vertex2].values[0];
+                } else {
+                    edge = &edges[edgeIndex];
+                    vertex1 = &vertices[edge->vertex1].values[0];
+                    vertex2 = &vertices[edge->vertex2].values[0];
+                }
 
-            green = vertex2[0] / 4096.0f;
-            blue = vertex2[1] / 4096.0f;
+                float green = vertex1[0] / 1024.0f;
+                float blue = vertex1[1] / 1024.0f;
 
-            glColor4f(1.0f,green,blue,1.0f);
-            glVertex3fv(vertex2);
+                glColor4f(1.0f,green,blue,1.0f);
+                glVertex3fv(vertex1);
+
+                green = vertex2[0] / 1024.0f;
+                blue = vertex2[1] / 1024.0f;
+
+                glColor4f(1.0f,green,blue,1.0f);
+                glVertex3fv(vertex2);
+            }
         }
         glEnd();
-
     }
 }
 

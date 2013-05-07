@@ -3,7 +3,7 @@
 
 #include <QGLWidget>
 
-class QMatrix4x4;
+class Matrix;
 struct BSPFile;
 
 class GLWidget : public QGLWidget
@@ -21,8 +21,8 @@ public:
 private:
     BSPFile *map;
 
-    QMatrix4x4 *projection;
-    QMatrix4x4 *world;
+    Matrix *projection;
+    Matrix *world;
 signals:
     
 public slots:

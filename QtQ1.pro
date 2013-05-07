@@ -16,11 +16,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     pakfile.cpp \
     bspfile.cpp \
-    glwidget.cpp
+    glwidget.cpp \
+    basictypes.cpp \
+    matrix.cpp
 
 HEADERS  += mainwindow.h \
     pakfile.h \
     bspfile.h \
-    glwidget.h
+    glwidget.h \
+    basictypes.h \
+    matrix.h
 
 FORMS    += mainwindow.ui

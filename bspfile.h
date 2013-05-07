@@ -1,19 +1,7 @@
 #ifndef BSPFILE_H
 #define BSPFILE_H
 
-typedef float scalar;        // Scalar value,
-
-typedef struct                 // Vector or Position
-{
-    union {
-        struct {
-            scalar x;                  // horizontal
-            scalar y;                  // horizontal
-            scalar z;                  // vertical
-        };
-        scalar values[3];
-    };
-} Vec3;
+#include "basictypes.h"
 
 typedef struct                 // Bounding Box, Float values
 {
@@ -40,7 +28,7 @@ struct BSPEdge {
     unsigned short vertex2;
 };
 
-#define	MAXLIGHTMAPS	4
+#define	MAX_LIGHTMAPS	4
 
 struct BSPFace {
     short planeNumber;
@@ -50,7 +38,7 @@ struct BSPFace {
     short textureInfo;
 
 // lighting info
-    unsigned char styles[MAXLIGHTMAPS];
+    unsigned char styles[MAX_LIGHTMAPS];
     int           lightOffset;		// start of [numstyles*surfsize] samples
 
     short getEdge(int edge);
@@ -118,7 +106,11 @@ struct BSPFile
     BSPEdge *getEdges();
     int countOfEdges();
 
-    short *getEdgeList();
+    BSPFace *getFaces();
+    int countOfFaces();
+
+    int *getEdgeList();
+
 };
 
 #endif // BSPFILE_H
