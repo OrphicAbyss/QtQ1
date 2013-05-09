@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+class QTimer;
+
 namespace Ui {
 class MainWindow;
 }
@@ -18,10 +20,14 @@ public:
 public slots:
     void openFile();
     void closeFile();
+    void renderFrame();
+    void updateFPS();
     
 private:
     Ui::MainWindow *ui;
     QByteArray data;
+    QTimer *timer;
+    QTimer *fpsTimer;
 };
 
 #endif // MAINWINDOW_H

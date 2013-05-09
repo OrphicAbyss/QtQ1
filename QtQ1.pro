@@ -18,13 +18,15 @@ SOURCES += main.cpp\
     bspfile.cpp \
     glwidget.cpp \
     basictypes.cpp \
-    matrix.cpp
+    matrix.cpp \
+    gametime.cpp
 
 HEADERS  += mainwindow.h \
     pakfile.h \
     bspfile.h \
     glwidget.h \
     basictypes.h \
-    matrix.h
+    matrix.h \
+    gametime.h
 
 FORMS    += mainwindow.ui

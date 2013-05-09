@@ -29,7 +29,7 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-    qDebug("Frame");
+    //qDebug("Frame");
 
     world->setToIdentity();
     //double seconds = GameTime::instance()->getTime();

@@ -3,14 +3,24 @@
 #include "pakfile.h"
 #include "bspfile.h"
 
+#include <QTimer>
 #include <QDebug>
 #include <QFileDialog>
+
+#include "gametime.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(renderFrame()));
+    timer->start(1);
+
+    fpsTimer = new QTimer(this);
+    connect(fpsTimer, SIGNAL(timeout()), this, SLOT(updateFPS()));
+    fpsTimer->start(1000);
 }
 
 MainWindow::~MainWindow()
@@ -21,6 +31,20 @@ MainWindow::~MainWindow()
 void MainWindow::closeFile()
 {
     data.clear();
+}
+
+void MainWindow::renderFrame()
+{
+    GameTime *time = GameTime::instance();
+    time->newFrame();
+
+    ui->widget->repaint();
+}
+
+void MainWindow::updateFPS()
+{
+    int fps = GameTime::instance()->markFPS();
+    ui->statusBar->showMessage(QString("FPS: %1").arg(fps));
 }
 
 void MainWindow::openFile()
