@@ -22,6 +22,10 @@ void Matrix::rotate(float angle, float x, float y, float z)
     implObj->rotate(angle, x, y,z);
 }
 
+void Matrix::scale(float x, float y, float z) {
+    implObj->scale(x, y, z);
+}
+
 const float *Matrix::data()
 {
     return implObj->constData();

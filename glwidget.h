@@ -18,6 +18,10 @@ public:
 
     void setMap(BSPFile *map);
 
+protected:
+    virtual void keyPressEvent (QKeyEvent *event);
+    virtual void keyReleaseEvent(QKeyEvent *event);
+
 private:
     BSPFile *map;
 

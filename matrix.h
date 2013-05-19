@@ -28,6 +28,8 @@ public:
     void translate(float x, float y, float z);
     /** Apply rotation to matrix. */
     void rotate(float angle, float x, float y, float z);
+    /** Apply scale to matrix. */
+    void scale(float x, float y, float z);
 
     /** Get data as an array */
     const float *data();

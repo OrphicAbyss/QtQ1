@@ -1,7 +1,10 @@
 #include "glwidget.h"
 
+#include <QInputEvent>
+
 #include "matrix.h"
 #include "bspfile.h"
+#include "gametime.h"
 
 GLWidget::GLWidget(QWidget *parent) :
     QGLWidget(parent)
@@ -23,7 +26,7 @@ void GLWidget::initializeGL()
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
 
-    glCullFace(GL_FRONT);
+    glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
 }
 
@@ -32,12 +35,12 @@ void GLWidget::paintGL()
     //qDebug("Frame");
 
     world->setToIdentity();
-    //double seconds = GameTime::instance()->getTime();
+    double seconds = GameTime::instance()->getTime();
 
     world->translate(0,-2048.0,0);
     world->rotate(45, 0.0f, 0.0f, 1.0f);
-    //world->rotate(seconds * 36.0, 1.0, 0.0, 0.0);
-    //world->rotate(seconds * 46.0, 0.0, 0.0, 1.0);
+    //world->rotate(seconds * 3.60, 1.0, 0.0, 0.0);
+    //world->rotate(seconds * 4.60, 0.0, 0.0, 1.0);
     glLoadMatrixf(world->data());
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -101,11 +104,26 @@ void GLWidget::resizeGL(int width, int height)
     double yFOV = 45.0;
     double aspect = (double)width / (double)height;
     projection->setToIdentity();
-    projection->perspective(yFOV / aspect, aspect, 5, 4096);
+    projection->perspective(yFOV / aspect, aspect, 5, 8192);
     projection->rotate(90.0f, 1.0f, 0.0f, 0.0f);
+    projection->scale(1.0f, 1.0f, -1.0f);
 
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(projection->data());
 
     glMatrixMode(GL_MODELVIEW);
+}
+
+void GLWidget::keyPressEvent (QKeyEvent *event)
+{
+    qDebug("Key press: %c", event->key());
+
+    QGLWidget::keyPressEvent(event);
+}
+
+void GLWidget::keyReleaseEvent(QKeyEvent *event)
+{
+    qDebug("Key release: %c", event->key());
+
+    QGLWidget::keyReleaseEvent(event);
 }
