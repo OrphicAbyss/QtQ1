@@ -23,14 +23,16 @@ struct BSPEntry
     int size;
 };
 
-struct BSPEdge {
+struct BSPEdge
+{
     unsigned short vertex1;
     unsigned short vertex2;
 };
 
 #define	MAX_LIGHTMAPS	4
 
-struct BSPFace {
+struct BSPFace
+{
     short planeNumber;
     short side;
     int   firstEdge;
@@ -42,6 +44,19 @@ struct BSPFace {
     int           lightOffset;		// start of [numstyles*surfsize] samples
 
     short getEdge(int edge);
+};
+
+#define	MIPLEVELS	4
+struct BSPMipTex {
+    char		name[16];
+    unsigned	width;
+    unsigned    height;
+    unsigned	offsets[MIPLEVELS];		// four mip maps stored
+};
+
+struct BSPMipTexEntries {
+    int			numMipTex;
+    int			dataofs[];          // [nummiptex]
 };
 
 #define	MAX_MAP_HULLS 4
@@ -111,6 +126,7 @@ struct BSPFile
 
     int *getEdgeList();
 
+    BSPMipTexEntries *getTexturesEntries();
 };
 
 #endif // BSPFILE_H

@@ -55,6 +55,16 @@ int BSPFile::countOfFaces()
     return this->faces.size / sizeof(BSPFace);
 }
 
+BSPTextureInfo *BSPFile::getTextureInfos()
+{
+    return (BSPTextureInfo *)((char *)this + this->texinfo.offset);
+}
+
+int BSPFile::countOfTextureInfos()
+{
+    return this->texinfo.size / sizeof(BSPTextureInfo);
+}
+
 int *BSPFile::getEdgeList()
 {
     return (int *)((char *)this + this->listOfEdges.offset);
@@ -70,4 +80,9 @@ short BSPFace::getEdge(int edge)
     } else {
         return first + edge;
     }
+}
+
+BSPMipTexEntries *BSPFile::getTexturesEntries()
+{
+    return (BSPMipTexEntries *)((char *)this + this->miptex.offset);
 }

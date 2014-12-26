@@ -1,6 +1,7 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#include <QWidget>
 #include <QGLWidget>
 
 class Matrix;

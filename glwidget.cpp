@@ -17,6 +17,17 @@ GLWidget::GLWidget(QWidget *parent) :
 void GLWidget::setMap(BSPFile *map)
 {
     this->map = map;
+
+    BSPMipTexEntries *entries = map->getTexturesEntries();
+    for (int i=0; i<entries->numMipTex; i++) {
+        BSPMipTex *entry = (BSPMipTex *)((char *)entries + entries->dataofs[i]);
+        QPixmap texture;
+        texture.loadFromData((char *)entry + entry->offsets[0], entry->height * entry->width);
+        GLunit id = bindTexture(texture, GL_TEXTURE_2D, GL_RGBA);
+        qDebug("Texture: %s (%d x %d)", entry->name, entry->height, entry->width);
+//        entries->dataofs
+        //entries->dataofs[i];
+    }
 }
 
 void GLWidget::initializeGL()
@@ -35,7 +46,7 @@ void GLWidget::paintGL()
     //qDebug("Frame");
 
     world->setToIdentity();
-    double seconds = GameTime::instance()->getTime();
+    //double seconds = GameTime::instance()->getTime();
 
     world->translate(0,-2048.0,0);
     world->rotate(45, 0.0f, 0.0f, 1.0f);

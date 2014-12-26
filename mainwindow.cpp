@@ -3,6 +3,7 @@
 #include "pakfile.h"
 #include "bspfile.h"
 
+#include <QString>
 #include <QTimer>
 #include <QDebug>
 #include <QFileDialog>
@@ -76,7 +77,11 @@ void MainWindow::openFile()
             QHash<QString, void *> hash;
 
             for (long i=0; i<numFiles; i++) {
-                qDebug("Pak Entry: %s", pakEntries[i].filename);
+                char *index = strstr(pakEntries[i].filename,".bsp");
+                if (NULL != index) {
+                    qDebug("Pak Entry: %s", pakEntries[i].filename);
+                }
+
                 hash.insert(pakEntries[i].filename, pakEntries[i].getFileData(header));
             }
 
@@ -85,6 +90,7 @@ void MainWindow::openFile()
                 qDebug("Valid map.");
                 qDebug("Number of models in map: %d", startMap->countOfModels());
                 qDebug("Number of vertices: %d", startMap->countOfVertices());
+
 
                 ui->widget->setMap(startMap);
                 ui->widget->repaint();
