@@ -46,6 +46,16 @@ struct BSPFace
     short getEdge(int edge);
 };
 
+struct BSPTextureInfo
+{
+    Vec3   vectorS;            // S vector, horizontal in texture space)
+    scalar distS;              // horizontal offset in texture space
+    Vec3   vectorT;            // T vector, vertical in texture space
+    scalar distT;              // vertical offset in texture space
+    int   textureId;          // Index of MipTexExtries
+    int   animated;           // 0 for ordinary textures, 1 for water
+};
+
 #define	MIPLEVELS	4
 struct BSPMipTex {
     char		name[16];
@@ -124,9 +134,13 @@ struct BSPFile
     BSPFace *getFaces();
     int countOfFaces();
 
+    BSPTextureInfo *getTextureInfos();
+    int countOfTextureInfos();
+    
     int *getEdgeList();
 
     BSPMipTexEntries *getTexturesEntries();
+    BSPMipTex *getMipTexture(int texture);
 };
 
 #endif // BSPFILE_H

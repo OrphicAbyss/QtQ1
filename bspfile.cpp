@@ -86,3 +86,10 @@ BSPMipTexEntries *BSPFile::getTexturesEntries()
 {
     return (BSPMipTexEntries *)((char *)this + this->miptex.offset);
 }
+
+BSPMipTex *BSPFile::getMipTexture(int texture)
+{
+    BSPMipTexEntries *entries = this->getTexturesEntries();
+
+    return (BSPMipTex *)((char *)entries + entries->dataofs[texture]);
+}

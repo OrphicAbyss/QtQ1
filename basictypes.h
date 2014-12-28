@@ -16,6 +16,7 @@ struct Vec3                 // Vector or Position
 
     scalar *getValues();
     void set(const Vec3 *values);
+    static scalar dot(Vec3 *vector1, Vec3 *vector2);
 };
 
 #endif // BASICTYPES_H

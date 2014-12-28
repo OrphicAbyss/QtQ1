@@ -6,6 +6,8 @@
 #include "bspfile.h"
 #include "gametime.h"
 
+bool first = true;
+
 GLWidget::GLWidget(QWidget *parent) :
     QGLWidget(parent)
 {
@@ -18,15 +20,15 @@ void GLWidget::setMap(BSPFile *map)
 {
     this->map = map;
 
+    first = true;
     BSPMipTexEntries *entries = map->getTexturesEntries();
+    this->mapTextures = (GLuint *)malloc(sizeof(GLuint) * entries->numMipTex);
+
     for (int i=0; i<entries->numMipTex; i++) {
         BSPMipTex *entry = (BSPMipTex *)((char *)entries + entries->dataofs[i]);
-        QPixmap texture;
-        texture.loadFromData((char *)entry + entry->offsets[0], entry->height * entry->width);
-        GLunit id = bindTexture(texture, GL_TEXTURE_2D, GL_RGBA);
-        qDebug("Texture: %s (%d x %d)", entry->name, entry->height, entry->width);
-//        entries->dataofs
-        //entries->dataofs[i];
+        QImage texture((unsigned char *)entry + entry->offsets[0], entry->width, entry->height, QImage::Format_RGB888);
+        this->mapTextures[i] = bindTexture(texture, GL_TEXTURE_2D, GL_RGBA);
+        qDebug("Texture: %s (%d x %d) id: %u", entry->name, entry->height, entry->width, this->mapTextures[i]);
     }
 }
 
@@ -63,14 +65,26 @@ void GLWidget::paintGL()
         int *faceEdges = map->getEdgeList();
         BSPEdge *edges = map->getEdges();
         Vec3 *vertices = map->getVertices();
+        BSPTextureInfo *textureInfos = map->getTextureInfos();
 
         Vec3 fan[3];
 
-        glBegin(GL_TRIANGLES);
         for (int i=0; i<faceCount; i++) {
             BSPFace *face = &faces[i];
+            BSPTextureInfo textInfo = textureInfos[face->textureInfo];
+
+            if (first) {
+                qDebug("Texture Info Id: %u", face->textureInfo);
+                qDebug("MipTexture Id: %u", textInfo.textureId);
+                qDebug("MipTexture name: %s", map->getMipTexture(textInfo.textureId)->name);
+            }
+//            GLuint texId = this->mapTextures[textureInfos[face->textureInfo].textureId];
             short firstEdge = face->firstEdge;
             int edgeCount = face->countOfEdges;
+
+            glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, this->mapTextures[textInfo.textureId]);
+            glBegin(GL_TRIANGLES);
 
             for (int j=0; j<edgeCount; j++) {
                 int edgeIndex = faceEdges[firstEdge + j];
@@ -98,14 +112,21 @@ void GLWidget::paintGL()
                         float green = vertex[0] / 1024.0f;
                         float blue = vertex[1] / 1024.0f;
 
+                        scalar s = Vec3::dot(&fan[k], &textInfo.vectorS) + textInfo.distS;
+                        scalar t = Vec3::dot(&fan[k], &textInfo.vectorT) + textInfo.distT;
+
                         glColor4f(1.0f,green,blue,1.0f);
+                        glTexCoord2f(s, t);
                         glVertex3fv(vertex);
                     }
                 }
             }
+            glEnd();
+            glDisable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, 0);
         }
-        glEnd();
     }
+    first = false;
 }
 
 void GLWidget::resizeGL(int width, int height)

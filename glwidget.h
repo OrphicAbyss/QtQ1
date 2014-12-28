@@ -25,6 +25,7 @@ protected:
 
 private:
     BSPFile *map;
+    GLuint *mapTextures;
 
     Matrix *projection;
     Matrix *world;
