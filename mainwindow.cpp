@@ -91,7 +91,7 @@ void MainWindow::openFile()
                 qDebug("Number of models in map: %d", startMap->countOfModels());
                 qDebug("Number of vertices: %d", startMap->countOfVertices());
 
-
+                ui->widget->setPaletteFile((unsigned char *)hash.value("gfx/palette.lmp"));
                 ui->widget->setMap(startMap);
                 ui->widget->repaint();
 

@@ -17,6 +17,7 @@ public:
     void paintGL();
     void resizeGL(int width, int height);
 
+    void setPaletteFile(unsigned char *fileData);
     void setMap(BSPFile *map);
 
 protected:

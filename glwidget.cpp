@@ -7,6 +7,7 @@
 #include "gametime.h"
 
 bool first = true;
+QVector<QRgb> colorPalette;
 
 GLWidget::GLWidget(QWidget *parent) :
     QGLWidget(parent)
@@ -14,6 +15,17 @@ GLWidget::GLWidget(QWidget *parent) :
     map = NULL;
     projection = new Matrix();
     world = new Matrix();
+}
+
+void GLWidget::setPaletteFile(unsigned char *fileData) {
+    int length = 255 * 3;
+    QVector<QRgb> colors(0);
+
+    for (int i=0; i<length; i+=3) {
+        colors.append(qRgb(fileData[i+0], fileData[i+1], fileData[i+2]));
+    }
+
+    colorPalette = colors;
 }
 
 void GLWidget::setMap(BSPFile *map)
@@ -27,6 +39,7 @@ void GLWidget::setMap(BSPFile *map)
     for (int i=0; i<entries->numMipTex; i++) {
         BSPMipTex *entry = (BSPMipTex *)((char *)entries + entries->dataofs[i]);
         QImage texture((unsigned char *)entry + entry->offsets[0], entry->width, entry->height, QImage::Format_Indexed8);
+        texture.setColorTable(colorPalette);
         this->mapTextures[i] = bindTexture(texture, GL_TEXTURE_2D, GL_RGBA);
         qDebug("Texture: %s (%d x %d) %x id: %u", entry->name, entry->height, entry->width, texture.pixel(0,0), this->mapTextures[i]);
     }
