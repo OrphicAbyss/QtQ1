@@ -26,9 +26,9 @@ void GLWidget::setMap(BSPFile *map)
 
     for (int i=0; i<entries->numMipTex; i++) {
         BSPMipTex *entry = (BSPMipTex *)((char *)entries + entries->dataofs[i]);
-        QImage texture((unsigned char *)entry + entry->offsets[0], entry->width, entry->height, QImage::Format_RGB888);
+        QImage texture((unsigned char *)entry + entry->offsets[0], entry->width, entry->height, QImage::Format_Indexed8);
         this->mapTextures[i] = bindTexture(texture, GL_TEXTURE_2D, GL_RGBA);
-        qDebug("Texture: %s (%d x %d) id: %u", entry->name, entry->height, entry->width, this->mapTextures[i]);
+        qDebug("Texture: %s (%d x %d) %x id: %u", entry->name, entry->height, entry->width, texture.pixel(0,0), this->mapTextures[i]);
     }
 }
 
@@ -66,24 +66,36 @@ void GLWidget::paintGL()
         BSPEdge *edges = map->getEdges();
         Vec3 *vertices = map->getVertices();
         BSPTextureInfo *textureInfos = map->getTextureInfos();
-
+        int lastId = 0, thisId = 0;
         Vec3 fan[3];
+
+
+        glActiveTexture(GL_TEXTURE0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
         for (int i=0; i<faceCount; i++) {
             BSPFace *face = &faces[i];
             BSPTextureInfo textInfo = textureInfos[face->textureInfo];
 
             if (first) {
-                qDebug("Texture Info Id: %u", face->textureInfo);
-                qDebug("MipTexture Id: %u", textInfo.textureId);
-                qDebug("MipTexture name: %s", map->getMipTexture(textInfo.textureId)->name);
+//                qDebug("Texture Info Id: %u", face->textureInfo);
+//                qDebug("MipTexture Id: %u", textInfo.textureId);
+//                qDebug("MipTexture name: %s", map->getMipTexture(textInfo.textureId)->name);
             }
 //            GLuint texId = this->mapTextures[textureInfos[face->textureInfo].textureId];
             short firstEdge = face->firstEdge;
             int edgeCount = face->countOfEdges;
 
             glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, this->mapTextures[textInfo.textureId]);
+            thisId = this->mapTextures[textInfo.textureId];
+//            if (thisId != lastId) {
+                glBindTexture(GL_TEXTURE_2D, thisId);
+//                lastId = thisId;
+//            }
             glBegin(GL_TRIANGLES);
 
             for (int j=0; j<edgeCount; j++) {
@@ -113,7 +125,10 @@ void GLWidget::paintGL()
                         float blue = vertex[1] / 1024.0f;
 
                         scalar s = Vec3::dot(&fan[k], &textInfo.vectorS) + textInfo.distS;
+                        s /= map->getMipTexture(textInfo.textureId)->width;
+
                         scalar t = Vec3::dot(&fan[k], &textInfo.vectorT) + textInfo.distT;
+                        t /= map->getMipTexture(textInfo.textureId)->height;
 
                         glColor4f(1.0f,green,blue,1.0f);
                         glTexCoord2f(s, t);
